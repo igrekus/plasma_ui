@@ -4,7 +4,8 @@ from PyQt6 import uic
 from PyQt6.QtCore import QTimer, QTime
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow
-from easymodbus.run import modbusClient
+# from easymodbus.run import modbusClient
+from easymodbus.modbusClient import ModbusClient as modbusClient
 
 from Recipe import Recipe
 from Settings import Settings
@@ -17,9 +18,12 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         # - private void MainForm_Load(object sender, EventArgs e)
+        self.recipe = Recipe()  # -   recipies
+        self.settings = Settings()  # -   settings
+        # self.settings.initialize()
 
         self.gas_out_valve = Valve(self.settings.gas_out_valve, False, QPixmap)
-        self.ar_valve = GasValve(self.setting.ar_valve, False, 0, self.settings.ar_mfc, self.settings.ar_sccm, QPixmap)
+        self.ar_valve = GasValve(self.settings.ar_valve, False, 0, self.settings.ar_mfc, self.settings.ar_sccm, QPixmap)
         self.o2_valve = GasValve(self.settings.o2_valve, False, 0, self.settings.o2_mfc, self.settings.o2_sccm,
                                  QPixmap())
         self.cf4_valve = GasValve(self.settings.cf4_valve, False, 0, self.settings.cf4_mfc, self.settings.cf4_sccm,
@@ -30,9 +34,6 @@ class MainWindow(QMainWindow):
         self.pump_valve = Valve(self.settings.pump_valve, False, QPixmap())
 
         # -  public partial class MainForm : Form
-        self.recipe = Recipe()  # -   recipies
-        self.settings = Settings()  # -   settings
-        self.settings.initialize()
         self.modbusClient = modbusClient(self.settings.plc_ip_adress, self.settings.plc_port)  # -   plc connecting
         self.valve_port = serial.Serial(self.settings.comport_name)  # -   com port variable
         self.recipe_part = os.path.abspath('./recipies')
@@ -45,7 +46,7 @@ class MainWindow(QMainWindow):
         self.timer_pressure_read = QTimer()  # - pressure call timer
         self.timer_for_vent = QTimer()  # - vent timer
         self.timer_process = QTimer()  # -   process timer
-        self.timer.ignition = QTimer()  # -   ignition process timer
+        self.timer_ignition = QTimer()  # -   ignition process timer
 
         # - private static string SerialMessage
         self.pressure_read = 0.0  # -   baratron pressure
