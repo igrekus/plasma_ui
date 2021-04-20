@@ -36,6 +36,7 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -61,6 +62,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>10</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -104,46 +106,13 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="title">
      <string>Параметры</string>
     </property>
-    <widget class="QLineEdit" name="ArsccmlineEdit_8">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>270</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_7">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>320</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-    </widget>
     <widget class="QLabel" name="ArLabel">
      <property name="geometry">
       <rect>
@@ -157,68 +126,12 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
       <string>Ar</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_5">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>220</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-    </widget>
-    <widget class="QLabel" name="N2txLabel">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>180</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>мл/мин</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_3">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>120</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
      </property>
     </widget>
     <widget class="QLabel" name="ArLabel_4">
@@ -234,6 +147,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -254,57 +168,12 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
       <string>O2</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="ttxLabel">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>230</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>сек</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="ptxLabel">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>330</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>мТорр</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="ArLabel_6">
@@ -320,6 +189,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -340,34 +210,12 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
       <string>CF4</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="CF4txLabel">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>130</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>мл/мин</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="ArLabel_8">
@@ -383,68 +231,12 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
       <string>W</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>20</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-    </widget>
-    <widget class="QLabel" name="ArtxLabel">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>30</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>мл/мин</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_6">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>370</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
      </property>
     </widget>
     <widget class="QLabel" name="ArLabel_7">
@@ -460,34 +252,12 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
       <string>tv</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="O2txLabel">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>80</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>мл/мин</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="ArLabel_5">
@@ -503,6 +273,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>20</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -510,87 +281,192 @@
       <string>p</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_4">
+    <widget class="QSpinBox" name="ArspinBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>170</y>
-       <width>91</width>
+       <x>70</x>
+       <y>20</y>
+       <width>211</width>
        <height>41</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
+     <property name="wrapping">
+      <bool>false</bool>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="accelerated">
+      <bool>false</bool>
+     </property>
+     <property name="keyboardTracking">
+      <bool>true</bool>
+     </property>
+     <property name="suffix">
+      <string notr="true"> мл/мин</string>
+     </property>
+     <property name="maximum">
+      <number>50</number>
+     </property>
+     <property name="displayIntegerBase">
+      <number>10</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="ArsccmlineEdit_2">
+    <widget class="QSpinBox" name="O2spinBox">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>70</x>
        <y>70</y>
-       <width>91</width>
+       <width>211</width>
        <height>41</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>15</pointsize>
-       <bold>true</bold>
-      </font>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="specialValueText">
+      <string/>
+     </property>
+     <property name="suffix">
+      <string notr="true"> мл/мин</string>
+     </property>
+     <property name="prefix">
+      <string notr="true"/>
+     </property>
+     <property name="maximum">
+      <number>50</number>
      </property>
     </widget>
-    <widget class="QLabel" name="wtxLabel">
+    <widget class="QSpinBox" name="CF4spinBox">
      <property name="geometry">
       <rect>
-       <x>110</x>
-       <y>280</y>
-       <width>61</width>
-       <height>21</height>
+       <x>70</x>
+       <y>120</y>
+       <width>211</width>
+       <height>41</height>
       </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Вт</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
+     <property name="suffix">
+      <string notr="true"> мл/мин</string>
+     </property>
+     <property name="maximum">
+      <number>50</number>
+     </property>
     </widget>
-    <widget class="QLabel" name="tvtxLabel">
+    <widget class="QSpinBox" name="N2spinBox">
      <property name="geometry">
       <rect>
-       <x>110</x>
-       <y>380</y>
-       <width>61</width>
-       <height>21</height>
+       <x>70</x>
+       <y>170</y>
+       <width>211</width>
+       <height>41</height>
       </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>12</pointsize>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string>сек</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true"> мл/мин</string>
+     </property>
+     <property name="maximum">
+      <number>50</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="tspinBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>220</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true"> сек</string>
+     </property>
+     <property name="maximum">
+      <number>1200</number>
+     </property>
+     <property name="singleStep">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="WspinBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>270</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true"> Вт</string>
+     </property>
+     <property name="maximum">
+      <number>250</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="pspinBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>320</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true">  мм.р.с</string>
+     </property>
+     <property name="minimum">
+      <number>200</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="tvspinBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>370</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true"> сек</string>
+     </property>
+     <property name="prefix">
+      <string notr="true"/>
+     </property>
+     <property name="maximum">
+      <number>20</number>
      </property>
     </widget>
    </widget>
@@ -607,6 +483,7 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -639,6 +516,7 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -664,6 +542,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -705,6 +584,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -746,6 +626,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -787,6 +668,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -828,6 +710,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -869,6 +752,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>30</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -905,17 +789,18 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="title">
      <string>Рецепты</string>
     </property>
-    <widget class="QPushButton" name="SaveButton">
+    <widget class="QPushButton" name="SaveRecipeButton">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>20</y>
+       <x>20</x>
+       <y>70</y>
        <width>121</width>
        <height>71</height>
       </rect>
@@ -930,6 +815,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>15</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -952,11 +838,11 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="LoadButton">
+    <widget class="QPushButton" name="LoadRecipeButton">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>100</y>
+       <x>270</x>
+       <y>70</y>
        <width>121</width>
        <height>71</height>
       </rect>
@@ -971,6 +857,7 @@
       <font>
        <family>Open Sans</family>
        <pointsize>15</pointsize>
+       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -997,10 +884,88 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>241</width>
+       <y>320</y>
+       <width>391</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="DeleteRecipeButton">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>500</y>
+       <width>121</width>
        <height>71</height>
       </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Open Sans</family>
+       <pointsize>15</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Удалить</string>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="RecipeNameEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>220</y>
+       <width>391</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RecipeNamelabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>180</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Имя рецепта</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RecipesListLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>280</y>
+       <width>201</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Список рецептов</string>
      </property>
     </widget>
    </widget>
@@ -1017,6 +982,7 @@
      <font>
       <family>Open Sans</family>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
