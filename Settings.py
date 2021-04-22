@@ -3,7 +3,7 @@ import json
 
 class Settings:
     def __init__(self,
-                 plc_ip_adress="192.168.0.10",
+                 plc_ip_address="192.168.0.10",
                  comport_name="COM4",
                  plc_port=502,
                  comport_baudrate=9600,
@@ -35,7 +35,7 @@ class Settings:
                  lid_up_button=0,
                  generator_hb=0
                  ):
-        self.plc_ip_adress = plc_ip_adress
+        self.plc_ip_address = plc_ip_address
         self.comport_name = comport_name
         self.plc_port = plc_port
         self.comport_baudrate = comport_baudrate
@@ -76,7 +76,7 @@ class Settings:
         with open('setting.json') as json_file:
             data = json.load(json_file)
 
-        self.plc_ip_adress = data['plc_ip_adress']
+        self.plc_ip_address = data['plc_ip_address']
         self.comport_name = data['comport_name']
         self.plc_port = data['plc_port']
         self.comport_baudrate = data['comport_baudrate']
@@ -106,6 +106,7 @@ class Settings:
         self.mw_ref_read = data['mw_ref_read']
         self.discrete_read = data['discrete_read']
         self.lid_up_button = data['lid_up_button']
+        self.lid_down_button = data['lid_down_button']
         self.generator_hb = data['generator_hb']
 
 # - code check file generation
