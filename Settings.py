@@ -1,10 +1,11 @@
 import json
 
 
+
 class Settings:
     def __init__(self,
                  plc_ip_address="192.168.0.10",
-                 comport_name="COM4",
+                 comport_name="COM2",
                  plc_port=502,
                  comport_baudrate=9600,
                  gas_out_valve=16387,

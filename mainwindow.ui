@@ -975,7 +975,7 @@
       <x>10</x>
       <y>660</y>
       <width>841</width>
-      <height>351</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -995,7 +995,7 @@
        <x>10</x>
        <y>30</y>
        <width>821</width>
-       <height>311</height>
+       <height>201</height>
       </rect>
      </property>
     </widget>

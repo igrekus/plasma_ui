@@ -8,7 +8,6 @@ import json
 
 from easymodbus.run import modbusClient, convert_registers_to_float
 
-
 from Recipe import Recipe
 from Settings import Settings
 from Valve import GasValve
@@ -51,12 +50,12 @@ class MainWindow(QMainWindow):
             baudrate=self.settings.comport_baudrate,
             timeout=500,
             write_timeout=500,
-            )  # -   com port variable
+        )  # -   com port variable
         # todo comport checking initialization
 
         # -  private static Valve VentValve;
-        self.timer_send_receive_modbus = QTimer()  # -   plc call timer
-        self.timer_check_throttle = QTimer()
+        self.timer_send_receive_modbus = QTimer(300)  # -   plc call timer
+        self.timer_check_trhrottle = QTimer()
         self.timer_pressure_read = QTimer()  # - pressure call timer
         self.timer_for_vent = QTimer()  # - vent timer
         self.timer_process = QTimer()  # -   process timer
@@ -65,10 +64,10 @@ class MainWindow(QMainWindow):
         # - private static string SerialMessage
         self.pressure_read = 0.0  # -   baratron pressure
         self.pressure_angle = False  # -   pressure and status of the drosel valve's call
-        self.process_time = QTimer()  # -   process time
+        self.process_time = 0  # -   process time
+        self.last_time = 0  # process remain time
         self.process_time_start = QTimer()  # -   starting process time
         self.process_time_end = QTimer()  # -   ending process time
-        self.last_time = QTime()  # process remain time
         self.process_started = False  # process status
         self.pre_pump_process_started = False  # pre pump process status
         self.pressure_input = 0  # reading value from the recipe
@@ -108,12 +107,12 @@ class MainWindow(QMainWindow):
         dir_list = os.listdir(path)
         rcp_list = []
 
-        if dir_list:    #  checking emptylness list
-            for file_name in os.listdir(path):  #   addiing rcp to list
+        if dir_list:  # checking emptylness list
+            for file_name in os.listdir(path):  # addiing rcp to list
                 if file_name.endswith('.rcp'):
                     rcp_list.append(file_name)
 
-        for rcp in rcp_list:    #   adding list to comborecipies
+        for rcp in rcp_list:  # adding list to comborecipies
             self._ui.comboRecipes.addItem(rcp)
 
     def switch_fields(self, parameter):
@@ -143,6 +142,8 @@ class MainWindow(QMainWindow):
         # textBoxRecipeNameLarge.Invoke((MethodInvoker)(() = > textBoxRecipeNameLarge.BackColor = formColor));
 
     def on_serial_data_received(self):
+        self.timer_check_trhrottle.stop()
+        self.timer_check_trhrottle.start(2000)
         # TODO getting data from com port
         pass
 
@@ -157,7 +158,7 @@ class MainWindow(QMainWindow):
 
     def on_timed_send_received_modbus(self, source, event):
         modbusClient.connect()
-        self.generator_hb = modbusClient.read_coils(self.settings.generator_hb,1)
+        self.generator_hb = modbusClient.read_coils(self.settings.generator_hb, 1)
 
         if self.lid_up_button:
             modbusClient.write_single_coil(self.settings.lid_up_button, True)
@@ -172,7 +173,7 @@ class MainWindow(QMainWindow):
             self.pump_valve.open()
             self.vent_valve.open()
             self.gas_out_valve.open()
-            # todo self.timer_pump_for_vent.start()
+            self.timer_pump_for_vent.start(10000)
             self.vent_button = False
 
         if self.process_end:
@@ -180,18 +181,19 @@ class MainWindow(QMainWindow):
             self.process_started = False
             self.process_time = 0
             self.close_all_gas_valves()
-            modbusClient.write_single_register(self.settings.mw_onoff,0)
+            modbusClient.write_single_register(self.settings.mw_onoff, 0)
             modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
             modbusClient.write_single_coil(self.settings.ignition, False)
             self.valve_port.write('P90\r\n')
             # todo update labelState text => 'process is ended'
 
         if self.ignition_start == True:
-            modbusClient.write_single_coil(self.settings.ignition, True)    #   ignition turn-on
+            modbusClient.write_single_coil(self.settings.ignition, True)  # ignition turn-on
             # todo update labelstate text => 'ignition'
-            # todo self.timer_ignition.start()  #   ignition timer start
+            self.timer_ignition.stop()
+            self.timer_ignition.start(1000) #   ignition timer start
         else:
-            modbusClient.write_single_coil(self.settings.ignition, False)   # ignition turn-off
+            modbusClient.write_single_coil(self.settings.ignition, False)  # ignition turn-off
 
         if self.pressure_read >= 100:
             vacuum = modbusClient.read_inputregisters(28696, 2)
@@ -240,13 +242,36 @@ class MainWindow(QMainWindow):
         if self.pre_pump_process_started:
 
             self.switch_fields(False)
+
+            if not self.process_started:
+                pass
+                # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Подача газа"));
+
+            if self.pressure_input - 0.2 <= self.pressure_read <= self.pressure_input + 0.2 and self.process_started:   # if the pressure in chamber is equal to input value and the process is not started
+                # todo console input pressure value
+                # todo self.timer_process.interval = self.process_time
+                # todo self.timer_process.start()
+                modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
+
+                self.ignition_start = True
+                self.process_started = True
+
+            if self.process_started:
+                pass
+                # todo last time
+                # todo label time remain
+                # todo progress bar
+
+
+        if self.process_started:
+            # todo inactive buttons
             # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Процесс запущен"));
-            modbusClient.write_single_coil(16413, True) # reading forwarded and reflected power from PLC
+            modbusClient.write_single_coil(16413, True)  # reading forwarded and reflected power from PLC
             mw_read = modbusClient.read_inputregisters(3, 2)
             fow_power = mw_read[0]
             ref_power = mw_read[1]
 
-            if fow_power/10 >= ref_power:
+            if fow_power / 10 >= ref_power:
                 # todo pictureBoxChamber.Invoke((MethodInvoker)(() = > pictureBoxSource.Image = PLC_TEST.Properties.Resources.PlasmaSourceOn));
                 pass
 
@@ -274,18 +299,18 @@ class MainWindow(QMainWindow):
             self.pump_button = False
 
         if self.start_button:
-            modbusClient.write_single_register(self.settings.mw_fow, self.mw_power) #   sending power to generator
-            modbusClient.write_single_register(self.settings.mw_ref, 100)   #   sending reflected power to generator
-            modbusClient.write_single_register(self.settings.mw_onoff, 210) #   setting generator's on-parameter
+            modbusClient.write_single_register(self.settings.mw_fow, self.mw_power)  # sending power to generator
+            modbusClient.write_single_register(self.settings.mw_ref, 100)  # sending reflected power to generator
+            modbusClient.write_single_register(self.settings.mw_onoff, 210)  # setting generator's on-parameter
 
             if self.sccm_ar > 0:
-                self.ar_valve.start_flow(self.sccm_ar)  #   opening Ar line
+                self.ar_valve.start_flow(self.sccm_ar)  # opening Ar line
             if self.sccm_o2 > 0:
-                self.o2_valve.start_flow(self.sccm_o2)  #   opening O2 line
+                self.o2_valve.start_flow(self.sccm_o2)  # opening O2 line
             if self.sccm_cf4 > 0:
-                self.cf4_valve.start_flow(self.sccm_cf4)    #   opening CF4 line
+                self.cf4_valve.start_flow(self.sccm_cf4)  # opening CF4 line
             if self.sccm_n2 > 0:
-                self.n2_valve.start_flow(self.sccm_n2)  #   opening N2 line
+                self.n2_valve.start_flow(self.sccm_n2)  # opening N2 line
 
             self.pump_valve.open()
             self.gas_out_valve.open()
@@ -296,28 +321,28 @@ class MainWindow(QMainWindow):
             self.switch_fields(True)
             self.valve_port.write('P90\r\n')
             self.close_all_gas_valves()
-            modbusClient.write_single_register(self.settings.mw_onoff, 0)   #   turn off generator
-            modbusClient.write_single_coil(self.settings.mw_apply_bit, True)    #   using mw_apply_bit
-            modbusClient.write_single_coil(self.settings.ignition, False)   #   ignition
-            self.process_started = False   #   process is not run
-            self.pre_pump_process_started = False   #   process is not run
+            modbusClient.write_single_register(self.settings.mw_onoff, 0)  # turn off generator
+            modbusClient.write_single_coil(self.settings.mw_apply_bit, True)  # using mw_apply_bit
+            modbusClient.write_single_coil(self.settings.ignition, False)  # ignition
+            self.process_started = False  # process is not run
+            self.pre_pump_process_started = False  # process is not run
             self.stop_button = False
 
-        self.descrete_read = modbusClient.read_discreteinputs(self.settings.discrete_read, 4)   #   reading discrete values from plc (safe button and lid position)
-        self.chiller_ok = self.discrete_read[3] #   reading flow detector cooling system
-        self.safe_button = self.discrete_read[2]    #   reading pressing safe button
-        self.lid_down_button = self.discrete_read[1]    #   reading lid low position
+        self.descrete_read = modbusClient.read_discreteinputs(self.settings.discrete_read,
+                                                              4)  # reading discrete values from plc (safe button and lid position)
+        self.chiller_ok = self.discrete_read[3]  # reading flow detector cooling system
+        self.safe_button = self.discrete_read[2]  # reading pressing safe button
+        self.lid_down_button = self.discrete_read[1]  # reading lid low position
 
-
-        if self.pump_for_vent:  #   vent-before-pump
-            self.pump_valve.close() #   close pump valve
-            self.timer_for_vent.start() #   N2 stop-timer start
-            self.pump_for_vent = False  #   vent-before-pump turn-off
+        if self.pump_for_vent:  # vent-before-pump
+            self.pump_valve.close()  # close pump valve
+            self.timer_for_vent.start()  # N2 stop-timer start
+            self.pump_for_vent = False  # vent-before-pump turn-off
 
         if self.vent_for_vent:
             self.vent_valve.close()
             self.gas_out_valve.close()
-            self.vent_for_vent  = False
+            self.vent_for_vent = False
 
         if not self.process_started and not self.pre_pump_process_started and self.lid_down_bit:
             # todo buttons
@@ -346,16 +371,14 @@ class MainWindow(QMainWindow):
             self.mfc_read = modbusClient.read_inputregisters(28690, 6)
 
         except Exception as ex:
-                # todo Console.WriteLine(ex.Message);
-                # todo Console.WriteLine(MFC_READ[0] + ' ' + MFC_READ[1]+' ' + MFC_READ[2] + ' ' + MFC_READ[3] + ' ' + MFC_READ[4] + ' ' + MFC_READ[5]);
+            # todo Console.WriteLine(ex.Message);
+            # todo Console.WriteLine(MFC_READ[0] + ' ' + MFC_READ[1]+' ' + MFC_READ[2] + ' ' + MFC_READ[3] + ' ' + MFC_READ[4] + ' ' + MFC_READ[5]);
             pass
         ar_sccm_read = round(modbusClient.convert_registers_to_float(self.ar_mfc_read), 2)
         o2_sccm_read = round(modbusClient.convert_registers_to_float(self.o2_mfc_read), 2)
         cf4_sccm_read = round(modbusClient.convert_registers_to_float(self.cf4_mfc_read), 2)
-        n2_mfc_read = modbusClient.read_inputregisters(28672,2)
+        n2_mfc_read = modbusClient.read_inputregisters(28672, 2)
         n2_sccm_read = round(modbusClient.convert_registers_to_float(self.n2_mfc_read))
-
-
 
         # todo textBoxArRead.Invoke((MethodInvoker)(() = > textBoxArRead.Text = AR_SCCM_READ.ToString()));
         # todo textBoxO2Read.Invoke((MethodInvoker)(() = > textBoxO2Read.Text = O2_SCCM_READ.ToString()));
@@ -363,24 +386,26 @@ class MainWindow(QMainWindow):
         # todo extBoxN2Read.Invoke((MethodInvoker)(() = > textBoxN2Read.Text = N2_SCCM_READ.ToString()));
         modbusClient.close()
 
-    def on_timed_check_throttle_event(self):    #   pump-before-vent timer triggering
+    def on_timed_check_throttle_event(self):  # pump-before-vent timer triggering
         self.throttle_valve = False
 
-    def on_timed_pump_for_vent_event(self): #   vent timer triggering
+    def on_timed_pump_for_vent_event(self):  # vent timer triggering
         self.pump_for_vent = True
 
-    def on_timed_pressure_read_event(self): #   pressure and angle call timer triggering
+    def on_timed_pressure_read_event(self):  # pressure and angle call timer triggering
 
-        if self.throttle_valve: #   checking connection to throttle valve
+        if self.throttle_valve:  # checking connection to throttle valve
 
             if self.pressure_angle:
 
-                self.valve_port.write('R5\r\n') #   pressure read command send via Serial
+                self.valve_port.write('R5\r\n')  # pressure read command send via Serial
                 self.pressure_angle = False
 
             else:
-                self.valve_port.write('R6\r\n') #   pressure read command send via Serial
+                self.valve_port.write('R6\r\n')  # pressure read command send via Serial
                 self.pressure_angle = True
+
+    # connections
 
     def plc_connect(self):
         try:
@@ -401,15 +426,16 @@ class MainWindow(QMainWindow):
         self.vent_valve.close()
         self.gas_out_valve.close()
 
-    def picture_box_throttle_valve_paint(self): #   throttle valve status drawing
+    def picture_box_throttle_valve_paint(self):  # throttle valve status drawing
         pass
 
-    def text_box_key_press(self):   #   only numbers are allowed
+    def text_box_key_press(self):  # only numbers are allowed
         pass
-        # todo get ... number from gui
+
+    # todo get ... number from gui
 
     def load_recipe(self):
-        file_add = './Recipies/'+ self._ui.comboRecipes.currentText()
+        file_add = './Recipies/' + self._ui.comboRecipes.currentText()
         with open(file_add, 'r') as json_file:
             data = json.load(json_file)
         self._ui.ArspinBox.setValue(data['ar'])
@@ -441,52 +467,58 @@ class MainWindow(QMainWindow):
         if self.valve_port.is_open:
             self.valve_port.write('D\r\n')
             self.throttle_valve = True
-            # todo ValvePort.DataReceived += new SerialDataReceivedEventHandler(OnSerialDataReceived);
+        # todo ValvePort.DataReceived += new SerialDataReceivedEventHandler(OnSerialDataReceived);
 
         if self.plc_connect:
             self.close_all_gas_valves()
             self.pump_valve.close()
-            modbusClient.write_single_coil(self.settings.com_bit, True) #
+            modbusClient.write_single_coil(self.settings.com_bit, True)  #
             modbusClient.close()
 
         # timers initialization
         #   check throttle valve timer
-        self.timer_check_throttle = QTimer.timer(2000) #todo timer
-        self.timer_check_throttle.elapsed += self.on_timed_check_throttle_event()
+        self.timer_check_throttle = QTimer.timeout.connect(self.on_timed_check_throttle_event)
         self.timer_check_throttle.enabled = True
         self.timer_check_throttle.auto_reset = False
-        self.timer_check_throttle.stop()   #   todo stop
+        self.timer_check_trhrottle.stop()
 
         #   ignition timer initialization
-        self.timer_ignition = QTimer.timer(500)  #   todo timer
-        self.timer_ignition.elapsed += self.on_timed_ignition_event()
+        self.timer_ignition = QTimer.timeout.connect(self.on_timed_ignition_event)
         self.timer_ignition.enabled = True
         self.timer_ignition.auto_reset = False
         self.timer_ignition.stop()
 
         #   process timer initialization
-        self.timer_process = QTimer.start() #   todo timer
-        self.timer_process.elapsed += self. on_timed_ignition_event()
+        self.timer_process = QTimer.timeout.connect(self.on_timed_process_event)
         self.timer_process.enabled = True
         self.timer_process.auto_reset = False
         self.timer_process.stop()
 
         #   pump_for_vent timer inialization
-        self.pump_for_vent = QTimer.start()  # todo timer
-        self.pump_for_vent.elapsed += self.on_timed_pump_for_vent_event()
+        self.pump_for_vent = QTimer.timeout.connect(self.on_timed_pump_for_vent_event)
         self.pump_for_vent.enabled = True
         self.pump_for_vent.auto_reset = False
         self.pump_for_vent.stop()
+        #    |
+        #    V
+        #   pump_for_vent timer inialization
+        self.pump_for_vent.timeout.connect(self.on_timed_pump_for_vent_event)
 
         #   pressure call timer initialization
-        self.timer_pressure_read = QTimer.start()  # todo timer
-        self.timer_pressure_read.elapsed += self.on_timed_pressure_read_event()
+        self.timer_pressure_read = QTimer.timeout.connect(self.on_timed_pressure_read_event)
         self.timer_pressure_read.enabled = True
         self.timer_pressure_read.auto_reset = False
 
-        #   vent timer initialization   # todo timer
+        #   vent timer initialization
+        self.timer_for_vent = QTimer.timeout.connect(self.on_timed_for_vent_event)
+        self.timer_for_vent.enabled = True
+        self.timer_for_vent.auto_reset = False
+        self.timer_for_vent.stop()
 
-        #   plc timer initialization   # todo timer
+        #   plc timer initialization
+        self.timer_send_receive_modbus = QTimer.timeout.connect(self.on_timed_send_received_modbus)
+        self.timer_send_receive_modbus.enabled = True
+        self.timer_send_receive_modbus.auto_reset = False
 
     def main_form_form_closing(self):
         pass
@@ -500,6 +532,7 @@ class MainWindow(QMainWindow):
         # timerSendReceiveModbus.Stop();
 
     #   SPINBOXES TO INT VALUES
+
     @pyqtSlot(int)
     def on_ArspinBox_valueChanged(self, value):
         print(value)
@@ -532,10 +565,10 @@ class MainWindow(QMainWindow):
     def on_tvspinBox_valueChanged(self, value):
         print(value)
 
-
     #   BUTTONS TRIGGERING
+
     @pyqtSlot()
-    def on_PumpButton_clicked(self):    #   pump button single click
+    def on_PumpButton_clicked(self):  # pump button single click
         self.pump_button = True
         # todo labelState.Invoke((MethodInvoker)(() = > labelState.Text = "Производится откачка камеры"));
         if self.throttle_valve:
@@ -594,14 +627,19 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_SaveRecipeButton_clicked(self):  # SaveRecipe button single click
         print('SaveRecipe button is clicked')
-        # todo SaveRecipe
+
+    # todo SaveRecipe
 
     @pyqtSlot()
     def on_LoadRecipeButton_clicked(self):  # LoadRecipe button single click
         print('LoadRecipe button is clicked')
-        # todo LoadRecipe
+
+    # todo LoadRecipe
 
     @pyqtSlot()
     def on_DeleteRecipeButton_clicked(self):  # DeleteRecipe button single click
         print('DeleteRecipe button is clicked')
-        # todo deleteRecipe
+    # todo deleteRecipe
+
+# self.setAttribute(Qt.WA_QuitOnClose)
+# self.setAttribute(Qt.WA_DeleteOnClose)
