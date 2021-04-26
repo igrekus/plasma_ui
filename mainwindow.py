@@ -1,5 +1,8 @@
 import os
 import serial
+
+import time
+
 from PyQt6 import uic
 from PyQt6.QtCore import QTimer, QTime, Qt, pyqtSlot
 from PyQt6.QtGui import QPixmap
@@ -54,20 +57,22 @@ class MainWindow(QMainWindow):
         # todo comport checking initialization
 
         # -  private static Valve VentValve;
-        self.timer_send_receive_modbus = QTimer(300)  # -   plc call timer
+        self.timer_send_receive_modbus = QTimer()  # -   plc call timer
         self.timer_check_trhrottle = QTimer()
         self.timer_pressure_read = QTimer()  # - pressure call timer
         self.timer_for_vent = QTimer()  # - vent timer
         self.timer_process = QTimer()  # -   process timer
         self.timer_ignition = QTimer()  # -   ignition process timer
 
+        self.process_time_start = 0  # -   starting process time
+        self.process_time_end = 0  # -   ending process time
+
+        self.process_time = 0  # -   process time
+        self.last_time = 0  # process remain time
+
         # - private static string SerialMessage
         self.pressure_read = 0.0  # -   baratron pressure
         self.pressure_angle = False  # -   pressure and status of the drosel valve's call
-        self.process_time = 0  # -   process time
-        self.last_time = 0  # process remain time
-        self.process_time_start = QTimer()  # -   starting process time
-        self.process_time_end = QTimer()  # -   ending process time
         self.process_started = False  # process status
         self.pre_pump_process_started = False  # pre pump process status
         self.pressure_input = 0  # reading value from the recipe
@@ -100,6 +105,8 @@ class MainWindow(QMainWindow):
         self.generator_hb = []
 
         self.read_recipes_from_folder()
+
+        self.timer_send_receive_modbus.start(300)
 
     def read_recipes_from_folder(self):  # reading recipes from the folder
         path = "./Recipies"
@@ -208,7 +215,7 @@ class MainWindow(QMainWindow):
                 #  todo buttonStart.Invoke((MethodInvoker)(() = > buttonStart.Enabled = false));
                 pass
 
-                if self.venting == False:
+                if not self.venting:
                     # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Напуск завершен"));
                     pass
 
@@ -248,16 +255,23 @@ class MainWindow(QMainWindow):
                 # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Подача газа"));
 
             if self.pressure_input - 0.2 <= self.pressure_read <= self.pressure_input + 0.2 and self.process_started:   # if the pressure in chamber is equal to input value and the process is not started
-                # todo console input pressure value
-                # todo self.timer_process.interval = self.process_time
-                # todo self.timer_process.start()
+                self.timer_process.interval()
+                self.timer_process.start()
+                self.process_time.start = time.time()
+                self.process_time_end = self.process_time_start + self.process_time
+
                 modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
 
                 self.ignition_start = True
                 self.process_started = True
 
+
             if self.process_started:
-                pass
+                self.last_time = self.process_time_end - time.time()
+                self._ui.processprogressBar.setvalue(100 - ((self.last_time * 100) / self.process_time))
+                self._ui.processtimelcdNumber.setvalue(self.last_time)
+
+
                 # todo last time
                 # todo label time remain
                 # todo progress bar
@@ -475,61 +489,51 @@ class MainWindow(QMainWindow):
             modbusClient.write_single_coil(self.settings.com_bit, True)  #
             modbusClient.close()
 
+
+
+
         # timers initialization
         #   check throttle valve timer
-        self.timer_check_throttle = QTimer.timeout.connect(self.on_timed_check_throttle_event)
-        self.timer_check_throttle.enabled = True
-        self.timer_check_throttle.auto_reset = False
-        self.timer_check_trhrottle.stop()
+        self.timer_check_trhrottle.timeout.connect(self.on_timed_check_throttle_event)
+        self.timer_check_trhrottle.setSingleShot(True)
 
         #   ignition timer initialization
-        self.timer_ignition = QTimer.timeout.connect(self.on_timed_ignition_event)
-        self.timer_ignition.enabled = True
-        self.timer_ignition.auto_reset = False
-        self.timer_ignition.stop()
+        self.timer_ignition.timeout.connect(self.on_timed_ignition_event)
+        self.timer_ignition.setSingleShot(True)
 
         #   process timer initialization
-        self.timer_process = QTimer.timeout.connect(self.on_timed_process_event)
-        self.timer_process.enabled = True
-        self.timer_process.auto_reset = False
-        self.timer_process.stop()
+        self.timer_process.timeout.connect(self.on_timed_process_event)
+        self.timer_process.setSingleShot(True)
 
         #   pump_for_vent timer inialization
-        self.pump_for_vent = QTimer.timeout.connect(self.on_timed_pump_for_vent_event)
-        self.pump_for_vent.enabled = True
-        self.pump_for_vent.auto_reset = False
-        self.pump_for_vent.stop()
-        #    |
-        #    V
-        #   pump_for_vent timer inialization
-        self.pump_for_vent.timeout.connect(self.on_timed_pump_for_vent_event)
+        self.timer_pump_for_vent.timeout.connect(self.on_timed_pump_for_vent_event)
+        self.timer_pump_for_vent.setSingleShot(True)
 
         #   pressure call timer initialization
-        self.timer_pressure_read = QTimer.timeout.connect(self.on_timed_pressure_read_event)
-        self.timer_pressure_read.enabled = True
-        self.timer_pressure_read.auto_reset = False
+        self.timer_pressure_read.timeout.connect(self.on_timed_pressure_read_event)
+        self.timer_pressure_read.setSingleShot(False)
 
         #   vent timer initialization
-        self.timer_for_vent = QTimer.timeout.connect(self.on_timed_for_vent_event)
-        self.timer_for_vent.enabled = True
-        self.timer_for_vent.auto_reset = False
-        self.timer_for_vent.stop()
+        self.timer_for_vent.timeout.connect(self.on_timed_for_vent_event)
+        self.timer_for_vent.setSingleShot(True)
 
         #   plc timer initialization
-        self.timer_send_receive_modbus = QTimer.timeout.connect(self.on_timed_send_received_modbus)
-        self.timer_send_receive_modbus.enabled = True
-        self.timer_send_receive_modbus.auto_reset = False
+        self.timer_send_receive_modbus.timeout.connect(self.on_timed_send_received_modbus)
+        self.timer_send_receive_modbus.setSingleShot(False)
+
+
+
 
     def main_form_form_closing(self):
-        pass
         # todo ValvePort.DataReceived -= new SerialDataReceivedEventHandler(OnSerialDataReceived);
-        # timerCheckThrottle.Stop();
-        # timerIgnition.Stop();
-        # timerProcess.Stop();
-        # timerPumpForVent.Stop();
-        # timerPressureRead.Stop();
-        # timerForVent.Stop();
-        # timerSendReceiveModbus.Stop();
+        self.timer_check_trhrottle.stop()
+        self.timer_ignition.stop()
+        self.timer_process.stop()
+        self.timer_pump_for_vent.stop()
+        self.timer_pressure_read.stop()
+        self.timer_for_vent.stop()
+        self.timer_send_receive_modbus.stop()
+
 
     #   SPINBOXES TO INT VALUES
 
@@ -565,6 +569,10 @@ class MainWindow(QMainWindow):
     def on_tvspinBox_valueChanged(self, value):
         print(value)
 
+
+
+
+
     #   BUTTONS TRIGGERING
 
     @pyqtSlot()
@@ -587,20 +595,20 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_StartButton_clicked(self):  # Start button single click
-        # buttonVent.Invoke((MethodInvoker)(() = > buttonVent.Enabled = false));
-        # buttonPump.Invoke((MethodInvoker)(() = > buttonPump.Enabled = false));
-        # sccmAr = int.Parse(textBoxAr.Text);
-        # sccmO2 = int.Parse(textBoxO2.Text);
-        # sccmCF4 = int.Parse(textBoxCF4.Text);
-        # sccmN2 = int.Parse(textBoxN2.Text);
-        # mwpower = int.Parse(textBoxPower.Text);
-        # pressureinput = (int.Parse(textBoxPressure.Text)) / 100;
-        # processtime = long.Parse(textBoxTime.Text) * 1000;
+        self.sccm_ar = self._ui.ArspinBox.value()
+        self.sccm_o2 = self._ui.O2spinBox.value()
+        self.sccm_cf4 = self._ui.CF4spinBox.value()
+        self.sccm_n2 = self._ui.N2spinBox.value()
+        self.mw_power = self._ui.WspinBox.value()
+        self.pressure_input = self._pspinBox.value()/100
+        self.process_time = self._ui.tspinBox.value()/1000
+        self.expultion_time = self._tvspinBox.value()/1000
+
         self.start_button = True
 
         if self.throttle_valve:
             self.valve_port.write('D\r\n')
-            self.valve_port.write('D' + self.pressure_input + '\r\n')
+            self.valve_port.write('D' + str(self.pressure_input) + '\r\n')
             # todo labelTimeLasts.Invoke((MethodInvoker)(() => labelTimeLasts.Text = (processtime / 1000).ToString()));
             self.pre_pump_process_started = True
 
@@ -643,3 +651,6 @@ class MainWindow(QMainWindow):
 
 # self.setAttribute(Qt.WA_QuitOnClose)
 # self.setAttribute(Qt.WA_DeleteOnClose)
+
+
+
