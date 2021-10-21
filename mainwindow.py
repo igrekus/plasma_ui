@@ -3,10 +3,10 @@ import serial
 
 import time
 
-from PyQt6 import uic
-from PyQt6.QtCore import QTimer, QTime, Qt, pyqtSlot
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QMainWindow
+from PyQt5 import uic
+from PyQt5.QtCore import QTimer, QTime, Qt, pyqtSlot
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMainWindow
 import json
 
 from easymodbus.run import modbusClient, convert_registers_to_float
