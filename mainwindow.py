@@ -9,7 +9,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow
 import json
 
-from easymodbus.run import modbusClient, convert_registers_to_float
+from easymodbus.modbusClient import ModbusClient, Parity, Stopbits, convert_registers_to_float, \
+    convert_float_to_two_registers
 
 from Recipe import Recipe
 from Settings import Settings
@@ -44,7 +45,30 @@ class MainWindow(QMainWindow):
         self.pump_valve = Valve(self.settings.pump_valve, False, QPixmap())
 
         # -  public partial class MainForm : Form
-        self.modbusClient = modbusClient(self.settings.plc_ip_address, self.settings.plc_port)  # -   plc connecting
+
+        # - ModbusClient PLC Connect
+        self.modbusClient = ModbusClient('192.168.0.10', 502)
+        self.modbusClient.parity = Parity.even
+        self.modbusClient.unitidentifier = 2
+        self.modbusClient.baudrate = 9600
+        self.modbusClient.stopbits = Stopbits.one
+        self.modbusClient.connect()
+        self.discreteInputs = self.modbusClient.read_discreteinputs(0, 8)
+
+        self.holdingRegisters = convert_registers_to_float(self.modbusClient.read_holdingregisters(0, 2))
+        print(self.holdingRegisters)
+        self.inputRegisters = self.modbusClient.read_inputregisters(0, 8)
+        print(self.inputRegisters)
+        self.coils = self.modbusClient.read_coils(0, 8)
+        print(self.coils)
+
+        self.modbusClient.write_single_coil(0, True)
+        self.modbusClient.write_single_register(0, 777)
+        self.modbusClient.write_multiple_coils(0, [True, True, True, True, True, False, True, True])
+        self.modbusClient.write_multiple_registers(0, convert_float_to_two_registers(3.141517))
+        self.modbusClient.close()
+
+
         self.recipe_part = os.path.abspath('./recipies')
         self.throttle_valve_angle = 0.0
         self.timer_pump_for_vent = QTimer()  # -  pre_vent timer
@@ -164,15 +188,15 @@ class MainWindow(QMainWindow):
         # todo remake
 
     def on_timed_send_received_modbus(self, source, event):
-        modbusClient.connect()
-        self.generator_hb = modbusClient.read_coils(self.settings.generator_hb, 1)
+        self.modbusClient.connect()
+        self.generator_hb = self.modbusClient.read_coils(self.settings.generator_hb, 1)
 
         if self.lid_up_button:
-            modbusClient.write_single_coil(self.settings.lid_up_button, True)
+            self.modbusClient.write_single_coil(self.settings.lid_up_button, True)
             self.lid_up_button = False
 
         if self.lid_down_button:
-            modbusClient.write_single_coil(self.settings.lid_up_button, False)
+            self.modbusClient.write_single_coil(self.settings.lid_up_button, False)
             self.lid_down_button = False
 
         if self.vent_button:
@@ -188,22 +212,22 @@ class MainWindow(QMainWindow):
             self.process_started = False
             self.process_time = 0
             self.close_all_gas_valves()
-            modbusClient.write_single_register(self.settings.mw_onoff, 0)
-            modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
-            modbusClient.write_single_coil(self.settings.ignition, False)
+            self.modbusClient.write_single_register(self.settings.mw_onoff, 0)
+            self.modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
+            self.modbusClient.write_single_coil(self.settings.ignition, False)
             self.valve_port.write('P90\r\n')
             # todo update labelState text => 'process is ended'
 
         if self.ignition_start == True:
-            modbusClient.write_single_coil(self.settings.ignition, True)  # ignition turn-on
+            self.modbusClient.write_single_coil(self.settings.ignition, True)  # ignition turn-on
             # todo update labelstate text => 'ignition'
             self.timer_ignition.stop()
             self.timer_ignition.start(1000) #   ignition timer start
         else:
-            modbusClient.write_single_coil(self.settings.ignition, False)  # ignition turn-off
+            self.modbusClient.write_single_coil(self.settings.ignition, False)  # ignition turn-off
 
         if self.pressure_read >= 100:
-            vacuum = modbusClient.read_inputregisters(28696, 2)
+            vacuum = self.modbusClient.read_inputregisters(28696, 2)
             vac = convert_registers_to_float(vacuum)
             vac_round = round((vac / 10 - 1) * 200, 0)
 
@@ -255,12 +279,13 @@ class MainWindow(QMainWindow):
                 # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Подача газа"));
 
             if self.pressure_input - 0.2 <= self.pressure_read <= self.pressure_input + 0.2 and self.process_started:   # if the pressure in chamber is equal to input value and the process is not started
-                self.timer_process.interval()
-                self.timer_process.start()
-                self.process_time.start = time.time()
-                self.process_time_end = self.process_time_start + self.process_time
 
-                modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
+                self.process_time_start = time.time()
+                self.process_time_end = self.process_time_start + self.process_time
+                self.timer_process.start(self.process_time)
+
+
+                self.modbusClient.write_single_coil(self.settings.mw_apply_bit, True)
 
                 self.ignition_start = True
                 self.process_started = True
@@ -268,8 +293,8 @@ class MainWindow(QMainWindow):
 
             if self.process_started:
                 self.last_time = self.process_time_end - time.time()
-                self._ui.processprogressBar.setvalue(100 - ((self.last_time * 100) / self.process_time))
-                self._ui.processtimelcdNumber.setvalue(self.last_time)
+                self._ui.processprogressBar.setValue(100 - ((self.last_time * 100) / self.process_time))
+                self._ui.processtimelcdNumber.setValue(self.last_time)
 
 
                 # todo last time
@@ -280,8 +305,8 @@ class MainWindow(QMainWindow):
         if self.process_started:
             # todo inactive buttons
             # todo labelState.Invoke((MethodInvoker)(() => labelState.Text = "Процесс запущен"));
-            modbusClient.write_single_coil(16413, True)  # reading forwarded and reflected power from PLC
-            mw_read = modbusClient.read_inputregisters(3, 2)
+            self.modbusClient.write_single_coil(16413, True)  # reading forwarded and reflected power from PLC
+            mw_read = self.modbusClient.read_inputregisters(3, 2)
             fow_power = mw_read[0]
             ref_power = mw_read[1]
 
@@ -313,9 +338,9 @@ class MainWindow(QMainWindow):
             self.pump_button = False
 
         if self.start_button:
-            modbusClient.write_single_register(self.settings.mw_fow, self.mw_power)  # sending power to generator
-            modbusClient.write_single_register(self.settings.mw_ref, 100)  # sending reflected power to generator
-            modbusClient.write_single_register(self.settings.mw_onoff, 210)  # setting generator's on-parameter
+            self.modbusClient.write_single_register(self.settings.mw_fow, self.mw_power)  # sending power to generator
+            self.modbusClient.write_single_register(self.settings.mw_ref, 100)  # sending reflected power to generator
+            self.modbusClient.write_single_register(self.settings.mw_onoff, 210)  # setting generator's on-parameter
 
             if self.sccm_ar > 0:
                 self.ar_valve.start_flow(self.sccm_ar)  # opening Ar line
@@ -335,14 +360,14 @@ class MainWindow(QMainWindow):
             self.switch_fields(True)
             self.valve_port.write('P90\r\n')
             self.close_all_gas_valves()
-            modbusClient.write_single_register(self.settings.mw_onoff, 0)  # turn off generator
-            modbusClient.write_single_coil(self.settings.mw_apply_bit, True)  # using mw_apply_bit
-            modbusClient.write_single_coil(self.settings.ignition, False)  # ignition
+            self.modbusClient.write_single_register(self.settings.mw_onoff, 0)  # turn off generator
+            self.modbusClient.write_single_coil(self.settings.mw_apply_bit, True)  # using mw_apply_bit
+            self.modbusClient.write_single_coil(self.settings.ignition, False)  # ignition
             self.process_started = False  # process is not run
             self.pre_pump_process_started = False  # process is not run
             self.stop_button = False
 
-        self.descrete_read = modbusClient.read_discreteinputs(self.settings.discrete_read,
+        self.descrete_read = self.modbusClient.read_discreteinputs(self.settings.discrete_read,
                                                               4)  # reading discrete values from plc (safe button and lid position)
         self.chiller_ok = self.discrete_read[3]  # reading flow detector cooling system
         self.safe_button = self.discrete_read[2]  # reading pressing safe button
@@ -382,23 +407,23 @@ class MainWindow(QMainWindow):
             # todo pictureBoxLid.Invoke((MethodInvoker)(() => pictureBoxLid.Image = PLC_TEST.Properties.Resources.LidClose));
 
         try:
-            self.mfc_read = modbusClient.read_inputregisters(28690, 6)
+            self.mfc_read = self.modbusClient.read_inputregisters(28690, 6)
 
         except Exception as ex:
             # todo Console.WriteLine(ex.Message);
             # todo Console.WriteLine(MFC_READ[0] + ' ' + MFC_READ[1]+' ' + MFC_READ[2] + ' ' + MFC_READ[3] + ' ' + MFC_READ[4] + ' ' + MFC_READ[5]);
             pass
-        ar_sccm_read = round(modbusClient.convert_registers_to_float(self.ar_mfc_read), 2)
-        o2_sccm_read = round(modbusClient.convert_registers_to_float(self.o2_mfc_read), 2)
-        cf4_sccm_read = round(modbusClient.convert_registers_to_float(self.cf4_mfc_read), 2)
-        n2_mfc_read = modbusClient.read_inputregisters(28672, 2)
-        n2_sccm_read = round(modbusClient.convert_registers_to_float(self.n2_mfc_read))
+        ar_sccm_read = round(convert_registers_to_float(self.ar_mfc_read), 2)
+        o2_sccm_read = round(convert_registers_to_float(self.o2_mfc_read), 2)
+        cf4_sccm_read = round(convert_registers_to_float(self.cf4_mfc_read), 2)
+        n2_mfc_read = self.modbusClient.read_inputregisters(28672, 2)
+        n2_sccm_read = round(self.modbusClient.convert_registers_to_float(self.n2_mfc_read))
 
         # todo textBoxArRead.Invoke((MethodInvoker)(() = > textBoxArRead.Text = AR_SCCM_READ.ToString()));
         # todo textBoxO2Read.Invoke((MethodInvoker)(() = > textBoxO2Read.Text = O2_SCCM_READ.ToString()));
         # todo textBoxCF4Read.Invoke((MethodInvoker)(() = > textBoxCF4Read.Text = CF4_SCCM_READ.ToString()));
         # todo extBoxN2Read.Invoke((MethodInvoker)(() = > textBoxN2Read.Text = N2_SCCM_READ.ToString()));
-        modbusClient.close()
+        self.modbusClient.close()
 
     def on_timed_check_throttle_event(self):  # pump-before-vent timer triggering
         self.throttle_valve = False
@@ -423,7 +448,7 @@ class MainWindow(QMainWindow):
 
     def plc_connect(self):
         try:
-            modbusClient.connect()
+            self.modbusClient.connect()
 
         except Exception as ex:
             print('error had happened during connection to PLC', ex)
@@ -486,8 +511,8 @@ class MainWindow(QMainWindow):
         if self.plc_connect:
             self.close_all_gas_valves()
             self.pump_valve.close()
-            modbusClient.write_single_coil(self.settings.com_bit, True)  #
-            modbusClient.close()
+            self.modbusClient.write_single_coil(self.settings.com_bit, True)  #
+            self.modbusClient.close()
 
 
 
