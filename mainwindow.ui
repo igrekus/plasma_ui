@@ -49,7 +49,7 @@
     <property name="title">
      <string>Процесс</string>
     </property>
-    <widget class="QProgressBar" name="progressBar">
+    <widget class="QProgressBar" name="processprogressBar">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -176,27 +176,6 @@
       <string>O2</string>
      </property>
     </widget>
-    <widget class="QLabel" name="ArLabel_6">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>270</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Open Sans</family>
-       <pointsize>20</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>t</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="ArLabel_3">
      <property name="geometry">
       <rect>
@@ -222,7 +201,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>320</y>
+       <y>270</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -264,7 +243,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>360</y>
+       <y>310</y>
        <width>51</width>
        <height>41</height>
       </rect>
@@ -384,33 +363,11 @@
       <number>50</number>
      </property>
     </widget>
-    <widget class="QSpinBox" name="tspinBox">
-     <property name="geometry">
-      <rect>
-       <x>70</x>
-       <y>260</y>
-       <width>211</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-     <property name="suffix">
-      <string notr="true"> сек</string>
-     </property>
-     <property name="maximum">
-      <number>1200</number>
-     </property>
-     <property name="singleStep">
-      <number>0</number>
-     </property>
-    </widget>
     <widget class="QSpinBox" name="WspinBox">
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>310</y>
+       <y>260</y>
        <width>211</width>
        <height>41</height>
       </rect>
@@ -429,7 +386,7 @@
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>360</y>
+       <y>310</y>
        <width>211</width>
        <height>41</height>
       </rect>
@@ -467,6 +424,49 @@
      </property>
      <property name="maximum">
       <number>20</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ArLabel_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>370</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Open Sans</family>
+       <pointsize>20</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>t</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="tspinBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>360</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string notr="true"> сек</string>
+     </property>
+     <property name="maximum">
+      <number>1200</number>
+     </property>
+     <property name="singleStep">
+      <number>0</number>
      </property>
     </widget>
    </widget>
