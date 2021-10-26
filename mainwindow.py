@@ -4,8 +4,7 @@ import serial
 import time
 
 from PyQt5 import uic
-from PyQt5.QtCore import QTimer, QTime, Qt, pyqtSlot
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QTimer, Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow
 import json
 
@@ -25,26 +24,13 @@ class MainWindow(QMainWindow):
 
         self._ui = uic.loadUi("mainwindow.ui", self)
 
-        self.setAttribute(Qt.WidgetAttribute.WA_QuitOnClose)
-        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(Qt.WA_QuitOnClose)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
         # - private void MainForm_Load(object sender, EventArgs e)
         self.recipe = Recipe()  # -   recipies
         self.settings = Settings()  # -   settings
         # self.settings.initialize()
-
-        self.gas_out_valve = Valve(self.settings.gas_out_valve, False, QPixmap)
-        self.ar_valve = GasValve(self.settings.ar_valve, False, 0, self.settings.ar_mfc, self.settings.ar_sccm, QPixmap)
-        self.o2_valve = GasValve(self.settings.o2_valve, False, 0, self.settings.o2_mfc, self.settings.o2_sccm,
-                                 QPixmap())
-        self.cf4_valve = GasValve(self.settings.cf4_valve, False, 0, self.settings.cf4_mfc, self.settings.cf4_sccm,
-                                  QPixmap())
-        self.n2_valve = GasValve(self.settings.n2_valve, False, 0, self.settings.n2_mfc, self.settings.n2_sccm,
-                                 QPixmap())
-        self.vent_valve = Valve(self.settings.vent_valve, False, QPixmap())
-        self.pump_valve = Valve(self.settings.pump_valve, False, QPixmap())
-
-        # -  public partial class MainForm : Form
 
         # - ModbusClient PLC Connect
         self.modbusClient = ModbusClient('192.168.0.10', 502)
@@ -53,6 +39,17 @@ class MainWindow(QMainWindow):
         self.modbusClient.baudrate = 9600
         self.modbusClient.stopbits = Stopbits.one
         self.modbusClient.connect()
+
+        self.gas_out_valve = Valve(self.settings.gas_out_valve, False, modbus_client=self.modbusClient)
+        self.ar_valve = GasValve(self.settings.ar_valve, False, 0, self.settings.ar_mfc, self.settings.ar_sccm)
+        self.o2_valve = GasValve(self.settings.o2_valve, False, 0, self.settings.o2_mfc, self.settings.o2_sccm)
+        self.cf4_valve = GasValve(self.settings.cf4_valve, False, 0, self.settings.cf4_mfc, self.settings.cf4_sccm)
+        self.n2_valve = GasValve(self.settings.n2_valve, False, 0, self.settings.n2_mfc, self.settings.n2_sccm)
+        self.vent_valve = Valve(self.settings.vent_valve, False, modbus_client = self.modbusClient)
+        self.pump_valve = Valve(self.settings.pump_valve, False, modbus_client = self.modbusClient)
+
+        # -  public partial class MainForm : Form
+
         self.discreteInputs = self.modbusClient.read_discreteinputs(0, 8)
 
         self.holdingRegisters = convert_registers_to_float(self.modbusClient.read_holdingregisters(0, 2))
@@ -417,7 +414,7 @@ class MainWindow(QMainWindow):
         o2_sccm_read = round(convert_registers_to_float(self.o2_mfc_read), 2)
         cf4_sccm_read = round(convert_registers_to_float(self.cf4_mfc_read), 2)
         n2_mfc_read = self.modbusClient.read_inputregisters(28672, 2)
-        n2_sccm_read = round(self.modbusClient.convert_registers_to_float(self.n2_mfc_read))
+        n2_sccm_read = round(convert_registers_to_float(self.n2_mfc_read))
 
         # todo textBoxArRead.Invoke((MethodInvoker)(() = > textBoxArRead.Text = AR_SCCM_READ.ToString()));
         # todo textBoxO2Read.Invoke((MethodInvoker)(() = > textBoxO2Read.Text = O2_SCCM_READ.ToString()));
